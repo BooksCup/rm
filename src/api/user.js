@@ -38,3 +38,10 @@ export function createUser(data) {
     params: data
   })
 }
+
+export function deleteUser(userId) {
+  return request({
+    url: 'http://localhost:8080/users/' + userId,
+    method: 'delete'
+  })
+}

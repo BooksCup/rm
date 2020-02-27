@@ -76,10 +76,9 @@
       </el-table-column>
 
       <el-table-column align="center" min-width="100px" label="操作">
-        <template slot-scope="scope">
-          <router-link :to="'/example/edit/'+scope.row.id">
-            <el-button type="primary" size="small" icon="el-icon-edit" />
-          </router-link>
+        <template slot-scope="{row, $index}">
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)" />
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)" />
         </template>
       </el-table-column>
     </el-table>
@@ -142,7 +141,7 @@
 </template>
 
 <script>
-  import { createUser, fetchUserList } from '@/api/user'
+  import { createUser, fetchUserList, deleteUser } from '@/api/user'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
   export default {
@@ -207,7 +206,8 @@
           title: '',
           type: '',
           status: 'published'
-        }
+        },
+        userId: ''
       }
     },
     created() {
@@ -243,11 +243,45 @@
           this.$refs['dataForm'].clearValidate()
         })
       },
+      handleDelete(row, index) {
+        this.$confirm('删除操作无法恢复，请谨慎删除。', '是否删除"' + row.name + '"?', {
+          confirmButtonText: '是',
+          cancelButtonText: '否',
+          type: 'error'
+        })
+          .then(async() => {
+            this.userId = row.id
+            deleteUser(row.id).then(response => {
+              console.log(response)
+              const code = response.status
+              if (code === 200) {
+                this.$notify({
+                  message: '删除成功!',
+                  type: 'success',
+                  duration: 2000
+                })
+                this.list.splice(index, 1)
+              } else {
+                this.$notify({
+                  message: '删除失败',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+              console.log(response)
+            })
+          })
+          .catch(err => {
+            console.error(err)
+          })
+      },
       createData() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             createUser(this.temp).then(response => {
-              this.list.unshift(response)
+              const code = response.code
+              console.log(code)
+              this.list.unshift(response.data)
               this.dialogFormVisible = false
               this.$notify({
                 message: '创建成功',
