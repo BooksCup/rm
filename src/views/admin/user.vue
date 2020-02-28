@@ -20,16 +20,6 @@
       >
         添加
       </el-button>
-      <el-button
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >
-        导出
-      </el-button>
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
@@ -77,8 +67,8 @@
 
       <el-table-column align="center" min-width="100px" label="操作">
         <template slot-scope="{row, $index}">
-          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)" />
-          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)" />
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)"/>
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)"/>
         </template>
       </el-table-column>
     </el-table>
@@ -91,7 +81,7 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="createFormVisible">
       <el-form
         ref="dataForm"
         :rules="createUserRules"
@@ -101,13 +91,13 @@
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="用户名" prop="name">
-          <el-input v-model="temp.name" placeholder="请输入用户名(必填)" />
+          <el-input v-model="temp.name" placeholder="请输入用户名(必填)"/>
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" placeholder="手机号(必填)" />
+          <el-input v-model="temp.phone" placeholder="手机号(必填)"/>
         </el-form-item>
         <el-form-item label="邮箱" prop="mail">
-          <el-input v-model="temp.mail" placeholder="邮箱(必填)" />
+          <el-input v-model="temp.mail" placeholder="邮箱(必填)"/>
         </el-form-item>
         <el-form-item label="描述">
           <el-input
@@ -119,10 +109,56 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="createFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="createData()">
+        <el-button type="primary" @click="createUser()">
+          保存
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="updateFormVisible">
+      <el-form
+        ref="updateForm"
+        :model="temp"
+        label-position="left"
+        label-width="70px"
+        style="width: 400px; margin-left:50px;"
+      >
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="temp.name" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="temp.phone" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="mail">
+          <el-input v-model="temp.mail" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-select v-model="temp.status">
+            <el-option
+              v-for="item in options"
+              :label="item.label"
+              :key="item.value"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input
+            v-model="temp.desc"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            type="textarea"
+            placeholder="描述（选填）"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="updateFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="updateUser()">
           保存
         </el-button>
       </div>
@@ -130,8 +166,8 @@
 
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
+        <el-table-column prop="key" label="Channel"/>
+        <el-table-column prop="pv" label="Pv"/>
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
@@ -141,12 +177,14 @@
 </template>
 
 <script>
-  import { createUser, fetchUserList, deleteUser } from '@/api/user'
+  import {createUser, fetchUserList, deleteUser, updateUser} from '@/api/user'
+  import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
   export default {
     name: 'ArticleList',
-    components: { Pagination },
+    components: {Pagination},
+    directives: {waves},
     filters: {
       statusFilter(status) {
         const statusMap = {
@@ -179,11 +217,17 @@
         }
       }
       return {
+        options: [
+          {value: "0", label: "启用"},
+          {value: "1", label: "停用"},
+        ],
         createUserRules: {
-          name: [{ required: true, trigger: 'blur', validator: validateUsername }],
-          phone: [{ required: true, trigger: 'blur', validator: validatePhone }],
-          mail: [{ required: true, trigger: 'blur', validator: validateMail }]
+          name: [{required: true, trigger: 'blur', validator: validateUsername}],
+          phone: [{required: true, trigger: 'blur', validator: validatePhone}],
+          mail: [{required: true, trigger: 'blur', validator: validateMail}]
         },
+        tableKey: 0,
+        pvData: [],
         list: null,
         total: 0,
         listLoading: true,
@@ -191,7 +235,8 @@
           page: 1,
           limit: 20
         },
-        dialogFormVisible: false,
+        createFormVisible: false,
+        updateFormVisible: false,
         dialogStatus: '',
         textMap: {
           update: '编辑用户',
@@ -205,7 +250,7 @@
           timestamp: new Date(),
           title: '',
           type: '',
-          status: 'published'
+          status: '0'
         },
         userId: ''
       }
@@ -232,16 +277,33 @@
           name: '',
           phone: '',
           mail: '',
-          desc: ''
+          desc: '',
+          status: '0'
+        }
+      },
+      initTemp(row) {
+        this.temp = {
+          id: row.id,
+          name: row.name,
+          phone: row.phone,
+          mail: row.mail,
+          desc: row.desc,
+          status: row.status,
+          createTime: row.createTime
         }
       },
       handleCreate() {
         this.resetTemp()
         this.dialogStatus = 'create'
-        this.dialogFormVisible = true
+        this.createFormVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
+      },
+      handleUpdate(row, index) {
+        this.initTemp(row)
+        this.dialogStatus = 'update'
+        this.updateFormVisible = true
       },
       handleDelete(row, index) {
         this.$confirm('删除操作无法恢复，请谨慎删除。', '是否删除"' + row.name + '"?', {
@@ -249,7 +311,7 @@
           cancelButtonText: '否',
           type: 'error'
         })
-          .then(async() => {
+          .then(async () => {
             this.userId = row.id
             deleteUser(row.id).then(response => {
               console.log(response)
@@ -275,19 +337,51 @@
             console.error(err)
           })
       },
-      createData() {
+      createUser() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             createUser(this.temp).then(response => {
-              const code = response.code
-              console.log(code)
-              this.list.unshift(response.data)
-              this.dialogFormVisible = false
-              this.$notify({
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
+              this.createFormVisible = false
+              const code = response.status
+              if (code === 200) {
+                this.list.unshift(response.data)
+                this.$notify({
+                  message: '创建成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify({
+                  message: '创建失败',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+            })
+          }
+        })
+      },
+      updateUser() {
+        this.$refs['updateForm'].validate((valid) => {
+          if (valid) {
+            updateUser(this.temp).then(response => {
+              this.updateFormVisible = false
+              const code = response.status
+              if (code === 200) {
+                this.$notify({
+                  message: '编辑成功',
+                  type: 'success',
+                  duration: 2000
+                })
+                const index = this.list.findIndex(v => v.id === this.temp.id)
+                this.list.splice(index, 1, this.temp)
+              } else {
+                this.$notify({
+                  message: '编辑失败',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
             })
           }
         })

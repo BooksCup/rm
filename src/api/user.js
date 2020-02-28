@@ -12,7 +12,7 @@ export function getInfo(token) {
   return request({
     url: '/vue-element-admin/user/info',
     method: 'get',
-    params: { token }
+    params: {token}
   })
 }
 
@@ -43,5 +43,13 @@ export function deleteUser(userId) {
   return request({
     url: 'http://localhost:8080/users/' + userId,
     method: 'delete'
+  })
+}
+
+export function updateUser(param) {
+  return request({
+    url: 'http://localhost:8080/users/' + param.id,
+    method: 'put',
+    params: param
   })
 }
