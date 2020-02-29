@@ -15,3 +15,11 @@ export function createSprint(data) {
     params: data
   })
 }
+
+export function updateSprint(param) {
+  return request({
+    url: 'http://localhost:8080/sprints/' + param.id,
+    method: 'put',
+    params: param
+  })
+}

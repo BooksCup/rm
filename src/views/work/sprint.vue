@@ -110,36 +110,26 @@
           <el-input v-model="temp.desc" placeholder="请输入描述"/>
         </el-form-item>
         <el-form-item label="开始日期" prop="beginDate">
-          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd"/>
+          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期"/>
         </el-form-item>
         <el-form-item label="结束日期" prop="endDate">
-          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd"/>
+          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="updateUser()">
+        <el-button type="primary" @click="updateSprint()">
           保存
         </el-button>
       </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import {getSprintList, createSprint} from '@/api/sprint'
+  import {getSprintList, createSprint, updateSprint} from '@/api/sprint'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -166,15 +156,12 @@
           update: '编辑迭代',
           create: '添加迭代'
         },
-        dialogPvVisible: false,
         temp: {
-          id: undefined,
-          importance: 1,
-          remark: '',
-          timestamp: new Date(),
-          title: '',
-          type: '',
-          status: '0'
+          id: '',
+          name: '',
+          desc: '',
+          beginDate: '',
+          endDate: ''
         },
         userId: ''
       }
@@ -283,10 +270,10 @@
           }
         })
       },
-      updateUser() {
+      updateSprint() {
         this.$refs['updateForm'].validate((valid) => {
           if (valid) {
-            updateUser(this.temp).then(response => {
+            updateSprint(this.temp).then(response => {
               this.updateFormVisible = false
               const code = response.status
               if (code === 200) {
