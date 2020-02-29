@@ -15,7 +15,7 @@
         class="filter-item"
         style="margin-left: 10px;"
         type="primary"
-        icon="el-icon-edit"
+        icon="el-icon-document-add"
         @click="handleCreate"
       >
         添加
@@ -49,8 +49,8 @@
 
       <el-table-column align="center" min-width="100px" label="操作">
         <template slot-scope="{row, $index}">
-          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)"/>
-          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)"/>
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)" />
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)" />
         </template>
       </el-table-column>
     </el-table>
@@ -66,23 +66,23 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="createFormVisible">
       <el-form
         ref="dataForm"
-        :rules="createUserRules"
+        :rules="createSprintRules"
         :model="temp"
         label-position="left"
         label-width="70px"
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="名称" prop="name">
-          <el-input v-model="temp.name" placeholder="请输入名称"/>
+          <el-input v-model="temp.name" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="描述" prop="phone">
-          <el-input v-model="temp.desc" placeholder="请输入描述"/>
+          <el-input v-model="temp.desc" placeholder="请输入描述" />
         </el-form-item>
         <el-form-item label="开始日期" prop="beginDate">
-          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期"/>
+          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期" />
         </el-form-item>
         <el-form-item label="结束日期" prop="endDate">
-          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期"/>
+          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -104,16 +104,16 @@
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="名称" prop="name">
-          <el-input v-model="temp.name" placeholder="请输入名称"/>
+          <el-input v-model="temp.name" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="描述" prop="phone">
-          <el-input v-model="temp.desc" placeholder="请输入描述"/>
+          <el-input v-model="temp.desc" placeholder="请输入描述" />
         </el-form-item>
         <el-form-item label="开始日期" prop="beginDate">
-          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期"/>
+          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期" />
         </el-form-item>
         <el-form-item label="结束日期" prop="endDate">
-          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期"/>
+          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -129,19 +129,28 @@
 </template>
 
 <script>
-  import {getSprintList, createSprint, updateSprint} from '@/api/sprint'
+  import { getSprintList, createSprint, updateSprint, deleteSprint } from '@/api/sprint'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
   export default {
     name: 'Sprint',
-    components: {Pagination},
-    directives: {waves},
+    components: { Pagination },
+    directives: { waves },
     filters: {},
     data() {
+      const validateSprintname = (rule, value, callback) => {
+        if (value.length === 0) {
+          callback(new Error('迭代名称不能为空!'))
+        } else {
+          callback()
+        }
+      }
       return {
+        createSprintRules: {
+          name: [{ required: true, trigger: 'blur', validator: validateSprintname }]
+        },
         tableKey: 0,
-        pvData: [],
         list: null,
         total: 0,
         listLoading: true,
@@ -163,7 +172,7 @@
           beginDate: '',
           endDate: ''
         },
-        userId: ''
+        sprintId: ''
       }
     },
     created() {
@@ -220,10 +229,9 @@
           cancelButtonText: '否',
           type: 'error'
         })
-          .then(async () => {
-            this.userId = row.id
-            deleteUser(row.id).then(response => {
-              console.log(response)
+          .then(async() => {
+            this.sprintId = row.id
+            deleteSprint(row.id).then(response => {
               const code = response.status
               if (code === 200) {
                 this.$notify({

@@ -23,3 +23,10 @@ export function updateSprint(param) {
     params: param
   })
 }
+
+export function deleteSprint(userId) {
+  return request({
+    url: 'http://localhost:8080/sprints/' + userId,
+    method: 'delete'
+  })
+}
