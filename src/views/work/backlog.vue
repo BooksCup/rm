@@ -67,8 +67,8 @@
 
       <el-table-column align="center" min-width="100px" label="操作">
         <template slot-scope="{row, $index}">
-          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)"/>
-          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)"/>
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)" />
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)" />
         </template>
       </el-table-column>
     </el-table>
@@ -87,25 +87,46 @@
         :rules="createUserRules"
         :model="temp"
         label-position="left"
-        label-width="70px"
+        label-width="120px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="temp.name" placeholder="请输入用户名(必填)"/>
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="temp.title" placeholder="请输入标题" />
         </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" placeholder="手机号(必填)"/>
+        <el-form-item label="状态" prop="statusId">
+          <el-select v-model="temp.statusId" class="filter-item" placeholder="">
+            <el-option v-for="item in statusOptions" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="邮箱" prop="mail">
-          <el-input v-model="temp.mail" placeholder="邮箱(必填)"/>
+        <el-form-item label="处理人" prop="currentUserId">
+          <el-select v-model="temp.currentUserId" class="filter-item" placeholder="">
+            <el-option v-for="item in currentUserOptions" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input
-            v-model="temp.desc"
-            :autosize="{ minRows: 2, maxRows: 4}"
-            type="textarea"
-            placeholder="描述（选填）"
-          />
+        <el-form-item label="模块" prop="moduleId">
+          <el-select v-model="temp.moduleId" class="filter-item" placeholder="">
+            <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="迭代" prop="sprintId">
+          <el-select v-model="temp.sprintId" class="filter-item" placeholder="">
+            <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="优先级顺序" prop="priorityOrder">
+          <el-select v-model="temp.priorityOrder" class="filter-item" placeholder="">
+            <el-option v-for="item in priorityOrderOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="优先级" prop="priority">
+          <el-select v-model="temp.priority" class="filter-item" placeholder="">
+            <el-option v-for="item in priorityOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="重要程度" prop="importance">
+          <el-select v-model="temp.importance" class="filter-item" placeholder="">
+            <el-option v-for="item in importanceOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -127,22 +148,22 @@
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="用户名" prop="name">
-          <el-input v-model="temp.name" :disabled="true"/>
+          <el-input v-model="temp.name" :disabled="true" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" :disabled="true"/>
+          <el-input v-model="temp.phone" :disabled="true" />
         </el-form-item>
         <el-form-item label="邮箱" prop="mail">
-          <el-input v-model="temp.mail" :disabled="true"/>
+          <el-input v-model="temp.mail" :disabled="true" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="temp.status">
             <el-option
               v-for="item in options"
-              :label="item.label"
               :key="item.value"
-              :value="item.value">
-            </el-option>
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="描述">
@@ -163,28 +184,19 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-  import {createUser, fetchUserList, deleteUser, updateUser} from '@/api/user'
+  import { createUser, fetchUserList, deleteUser, updateUser } from '@/api/user'
+  import { fetchOptions } from '@/api/options'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
   export default {
     name: 'ArticleList',
-    components: {Pagination},
-    directives: {waves},
+    components: { Pagination },
+    directives: { waves },
     filters: {
       statusFilter(status) {
         const statusMap = {
@@ -218,13 +230,40 @@
       }
       return {
         options: [
-          {value: "0", label: "启用"},
-          {value: "1", label: "停用"},
+          { value: '0', label: '启用' },
+          { value: '1', label: '停用' }
+        ],
+        currentUserOptions: null,
+        statusOptions: null,
+        moduleOptions: null,
+        sprintOptions: null,
+        priorityOrderOptions: [
+          { value: '1', label: '1' },
+          { value: '2', label: '2' },
+          { value: '3', label: '3' },
+          { value: '4', label: '4' },
+          { value: '5', label: '5' },
+          { value: '6', label: '6' },
+          { value: '7', label: '7' },
+          { value: '8', label: '8' },
+          { value: '9', label: '9' },
+          { value: '10', label: '10' }
+        ],
+        priorityOptions: [
+          { value: '0', label: '低' },
+          { value: '1', label: '中' },
+          { value: '2', label: '高' }
+        ],
+        importanceOptions: [
+          { value: '0', label: '提示' },
+          { value: '1', label: '一般' },
+          { value: '2', label: '重要' },
+          { value: '3', label: '关键' }
         ],
         createUserRules: {
-          name: [{required: true, trigger: 'blur', validator: validateUsername}],
-          phone: [{required: true, trigger: 'blur', validator: validatePhone}],
-          mail: [{required: true, trigger: 'blur', validator: validateMail}]
+          name: [{ required: true, trigger: 'blur', validator: validateUsername }],
+          phone: [{ required: true, trigger: 'blur', validator: validatePhone }],
+          mail: [{ required: true, trigger: 'blur', validator: validateMail }]
         },
         tableKey: 0,
         pvData: [],
@@ -242,7 +281,6 @@
           update: '编辑用户',
           create: '添加用户'
         },
-        dialogPvVisible: false,
         temp: {
           id: undefined,
           importance: 1,
@@ -274,11 +312,14 @@
       },
       resetTemp() {
         this.temp = {
-          name: '',
-          phone: '',
-          mail: '',
-          desc: '',
-          status: '0'
+          title: '',
+          statusId: '',
+          currentUserId: '',
+          moduleId: '',
+          sprintId: '',
+          priorityOrder: '',
+          priority: '',
+          importance: ''
         }
       },
       initTemp(row) {
@@ -296,6 +337,14 @@
         this.resetTemp()
         this.dialogStatus = 'create'
         this.createFormVisible = true
+        fetchOptions(this.listQuery).then(response => {
+          const res = response.data
+          this.currentUserOptions = res.currentUserList
+          this.statusOptions = res.statusList
+          this.moduleOptions = res.moduleList
+          this.sprintOptions = res.sprintList
+          this.statusOptions = res.statusList
+        })
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
@@ -311,7 +360,7 @@
           cancelButtonText: '否',
           type: 'error'
         })
-          .then(async () => {
+          .then(async() => {
             this.userId = row.id
             deleteUser(row.id).then(response => {
               console.log(response)
