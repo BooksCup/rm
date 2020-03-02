@@ -133,7 +133,7 @@
         <el-button @click="createFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="createUser()">
+        <el-button type="primary" @click="createBacklog()">
           保存
         </el-button>
       </div>
@@ -190,6 +190,7 @@
 <script>
   import { createUser, fetchUserList, deleteUser, updateUser } from '@/api/user'
   import { fetchOptions } from '@/api/options'
+  import { createBacklog } from '@/api/backlog'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -343,7 +344,6 @@
           this.statusOptions = res.statusList
           this.moduleOptions = res.moduleList
           this.sprintOptions = res.sprintList
-          this.statusOptions = res.statusList
         })
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
@@ -386,14 +386,13 @@
             console.error(err)
           })
       },
-      createUser() {
+      createBacklog() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            createUser(this.temp).then(response => {
+            createBacklog(this.temp).then(response => {
               this.createFormVisible = false
               const code = response.status
               if (code === 200) {
-                this.list.unshift(response.data)
                 this.$notify({
                   message: '创建成功',
                   type: 'success',
