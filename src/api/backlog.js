@@ -7,3 +7,11 @@ export function createBacklog(data) {
     params: data
   })
 }
+
+export function fetchBacklogList(query) {
+  return request({
+    url: 'http://localhost:8080/backlogs',
+    method: 'get',
+    params: query
+  })
+}

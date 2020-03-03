@@ -23,43 +23,50 @@
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" width="170px" label="用户名称">
+      <el-table-column align="left" width="370px" label="标题">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <el-tag :type="scope.row.type | typeTagFilter">{{ scope.row.type | typeFilter }}</el-tag>
+          <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="170px" label="手机号">
+      <el-table-column align="center" width="120px" label="迭代">
         <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.sprintName }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="170px" label="邮箱">
+      <el-table-column align="center" width="120px" label="当前处理人">
         <template slot-scope="scope">
-          <span>{{ scope.row.mail }}</span>
+          <span>{{ scope.row.currentUserName }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="170px" label="描述">
+      <el-table-column align="center" width="120px" label="优先级顺序">
         <template slot-scope="scope">
-          <span>{{ scope.row.desc }}</span>
+          <span>{{ scope.row.priorityOrder }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="170px" label="状态" class-name="status-col">
-        <template slot-scope="{row}">
-          <el-tag>{{ row.status | statusFilter }}</el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" width="170px" label="最后一次登录时间">
+      <el-table-column align="center" width="120px" label="优先级">
         <template slot-scope="scope">
-          <span>{{ scope.row.lastLoginTime }}</span>
+          <el-tag :type="scope.row.priority | priorityTagFilter">{{ scope.row.priority | priorityFilter }}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="170px" label="创建时间">
+      <el-table-column align="center" width="120px" label="重要程度">
+        <template slot-scope="scope">
+          <el-tag>{{ scope.row.importance | importanceFilter }}</el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" width="120px" label="状态">
+        <template slot-scope="scope">
+          <span>{{ scope.row.statusName }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" width="180px" label="创建时间">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
@@ -67,8 +74,8 @@
 
       <el-table-column align="center" min-width="100px" label="操作">
         <template slot-scope="{row, $index}">
-          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)" />
-          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)" />
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)"/>
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)"/>
         </template>
       </el-table-column>
     </el-table>
@@ -90,42 +97,47 @@
         label-width="120px"
         style="width: 400px; margin-left:50px;"
       >
+        <el-form-item label="类型" prop="type">
+          <el-select v-model="temp.type" class="filter-item" placeholder="">
+            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
+        </el-form-item>
         <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title" placeholder="请输入标题" />
+          <el-input v-model="temp.title" placeholder="请输入标题"/>
         </el-form-item>
         <el-form-item label="状态" prop="statusId">
           <el-select v-model="temp.statusId" class="filter-item" placeholder="">
-            <el-option v-for="item in statusOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in statusOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="处理人" prop="currentUserId">
           <el-select v-model="temp.currentUserId" class="filter-item" placeholder="">
-            <el-option v-for="item in currentUserOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in currentUserOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="模块" prop="moduleId">
           <el-select v-model="temp.moduleId" class="filter-item" placeholder="">
-            <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="迭代" prop="sprintId">
           <el-select v-model="temp.sprintId" class="filter-item" placeholder="">
-            <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="优先级顺序" prop="priorityOrder">
           <el-select v-model="temp.priorityOrder" class="filter-item" placeholder="">
-            <el-option v-for="item in priorityOrderOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in priorityOrderOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="优先级" prop="priority">
           <el-select v-model="temp.priority" class="filter-item" placeholder="">
-            <el-option v-for="item in priorityOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in priorityOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="重要程度" prop="importance">
           <el-select v-model="temp.importance" class="filter-item" placeholder="">
-            <el-option v-for="item in importanceOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in importanceOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -148,13 +160,13 @@
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="用户名" prop="name">
-          <el-input v-model="temp.name" :disabled="true" />
+          <el-input v-model="temp.name" :disabled="true"/>
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" :disabled="true" />
+          <el-input v-model="temp.phone" :disabled="true"/>
         </el-form-item>
         <el-form-item label="邮箱" prop="mail">
-          <el-input v-model="temp.mail" :disabled="true" />
+          <el-input v-model="temp.mail" :disabled="true"/>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="temp.status">
@@ -188,23 +200,78 @@
 </template>
 
 <script>
-  import { createUser, fetchUserList, deleteUser, updateUser } from '@/api/user'
-  import { fetchOptions } from '@/api/options'
-  import { createBacklog } from '@/api/backlog'
+  import {createUser, fetchUserList, deleteUser, updateUser} from '@/api/user'
+  import {fetchOptions} from '@/api/options'
+  import {createBacklog, fetchBacklogList} from '@/api/backlog'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
+  // type
+  // story/bug
+  const typeOptions = [
+    {value: '0', label: 'story'},
+    {value: '1', label: 'bug'},
+  ]
+
+  const typeKeyValue = typeOptions.reduce((acc, cur) => {
+    acc[cur.value] = cur.label
+    return acc
+  }, {})
+
+  // 优先级
+  const priorityOptions = [
+    {value: '0', label: '低'},
+    {value: '1', label: '中'},
+    {value: '2', label: '高'}
+  ]
+
+  const priorityKeyValue = priorityOptions.reduce((acc, cur) => {
+    acc[cur.value] = cur.label
+    return acc
+  }, {})
+
+  // 重要程度
+  const importanceOptions = [
+    {value: '0', label: '提示'},
+    {value: '1', label: '一般'},
+    {value: '2', label: '重要'},
+    {value: '3', label: '关键'}
+  ]
+
+  const importanceKeyValue = importanceOptions.reduce((acc, cur) => {
+    acc[cur.value] = cur.label
+    return acc
+  }, {})
+
   export default {
-    name: 'ArticleList',
-    components: { Pagination },
-    directives: { waves },
+    name: 'Backlog',
+    components: {Pagination},
+    directives: {waves},
     filters: {
-      statusFilter(status) {
-        const statusMap = {
-          0: '启用',
-          1: '停用'
+      typeFilter(type) {
+        return typeKeyValue[type]
+      },
+      typeTagFilter(type) {
+        const typeTagMap = {
+          '0': 'success',
+          '1': 'danger'
         }
-        return statusMap[status]
+        return typeTagMap[type]
+      },
+      priorityFilter(priority) {
+        return priorityKeyValue[priority]
+      },
+      priorityTagFilter(priority) {
+        const priorityTagMap = {
+          '0': 'info',
+          '1': 'warning',
+          '2': 'danger'
+        }
+        return priorityTagMap[priority]
+      },
+
+      importanceFilter(importance) {
+        return importanceKeyValue[importance]
       }
     },
     data() {
@@ -230,41 +297,38 @@
         }
       }
       return {
-        options: [
-          { value: '0', label: '启用' },
-          { value: '1', label: '停用' }
-        ],
         currentUserOptions: null,
         statusOptions: null,
         moduleOptions: null,
         sprintOptions: null,
+        priorityOptions,
+        typeOptions: [
+          {value: '0', label: 'story'},
+          {value: '1', label: 'bug'}
+        ],
         priorityOrderOptions: [
-          { value: '1', label: '1' },
-          { value: '2', label: '2' },
-          { value: '3', label: '3' },
-          { value: '4', label: '4' },
-          { value: '5', label: '5' },
-          { value: '6', label: '6' },
-          { value: '7', label: '7' },
-          { value: '8', label: '8' },
-          { value: '9', label: '9' },
-          { value: '10', label: '10' }
+          {value: '1', label: '1'},
+          {value: '2', label: '2'},
+          {value: '3', label: '3'},
+          {value: '4', label: '4'},
+          {value: '5', label: '5'},
+          {value: '6', label: '6'},
+          {value: '7', label: '7'},
+          {value: '8', label: '8'},
+          {value: '9', label: '9'},
+          {value: '10', label: '10'}
         ],
-        priorityOptions: [
-          { value: '0', label: '低' },
-          { value: '1', label: '中' },
-          { value: '2', label: '高' }
-        ],
+
         importanceOptions: [
-          { value: '0', label: '提示' },
-          { value: '1', label: '一般' },
-          { value: '2', label: '重要' },
-          { value: '3', label: '关键' }
+          {value: '0', label: '提示'},
+          {value: '1', label: '一般'},
+          {value: '2', label: '重要'},
+          {value: '3', label: '关键'}
         ],
         createUserRules: {
-          name: [{ required: true, trigger: 'blur', validator: validateUsername }],
-          phone: [{ required: true, trigger: 'blur', validator: validatePhone }],
-          mail: [{ required: true, trigger: 'blur', validator: validateMail }]
+          name: [{required: true, trigger: 'blur', validator: validateUsername}],
+          phone: [{required: true, trigger: 'blur', validator: validatePhone}],
+          mail: [{required: true, trigger: 'blur', validator: validateMail}]
         },
         tableKey: 0,
         pvData: [],
@@ -300,7 +364,7 @@
     methods: {
       getList() {
         this.listLoading = true
-        fetchUserList(this.listQuery).then(response => {
+        fetchBacklogList(this.listQuery).then(response => {
           const res = response.data
           this.list = res.list
           this.total = res.total
@@ -360,7 +424,7 @@
           cancelButtonText: '否',
           type: 'error'
         })
-          .then(async() => {
+          .then(async () => {
             this.userId = row.id
             deleteUser(row.id).then(response => {
               console.log(response)
@@ -393,6 +457,7 @@
               this.createFormVisible = false
               const code = response.status
               if (code === 200) {
+                this.list.unshift(response.data)
                 this.$notify({
                   message: '创建成功',
                   type: 'success',
