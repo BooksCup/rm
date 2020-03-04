@@ -15,3 +15,10 @@ export function fetchBacklogList(query) {
     params: query
   })
 }
+
+export function deleteBacklog(backlogId) {
+  return request({
+    url: 'http://localhost:8080/backlogs/' + backlogId,
+    method: 'delete'
+  })
+}
