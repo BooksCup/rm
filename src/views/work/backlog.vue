@@ -26,12 +26,14 @@
       <el-table-column align="left" width="370px" label="标题">
         <template slot-scope="scope">
           <el-tag :type="scope.row.type | typeTagFilter">{{ scope.row.type | typeFilter }}</el-tag>
-          <span>【{{ scope.row.moduleName }}】{{ scope.row.title }}</span>
+          <span v-if="scope.row.moduleName === null || scope.row.moduleName === ''">{{ scope.row.title }}</span>
+          <span v-else>【{{ scope.row.moduleName }}】{{ scope.row.title }}</span>
         </template>
       </el-table-column>
 
       <el-table-column align="center" width="120px" label="迭代">
         <template slot-scope="scope">
+          <span v-if="scope.row.sprintName === null || scope.row.sprintName === ''">--</span>
           <span>{{ scope.row.sprintName }}</span>
         </template>
       </el-table-column>
@@ -92,7 +94,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="createFormVisible">
       <el-form
         ref="dataForm"
-        :rules="createUserRules"
+        :rules="createBacklogRules"
         :model="temp"
         label-position="left"
         label-width="150px"
@@ -122,16 +124,16 @@
           </el-select>
         </el-form-item>
         <el-form-item label="迭代" prop="sprintId">
-          <el-select v-model="temp.sprintId" class="filter-item" placeholder="" @change="choseSprint" clearable>
+          <el-select v-model="temp.sprintId" class="filter-item" placeholder="" clearable @change="choseSprint">
             <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否联动预计开始结束日期？" prop="isLinkSprint" v-show="showIsLinkSprint">
+        <el-form-item v-show="showIsLinkSprint" label="是否联动预计开始结束日期？" prop="isLinkSprint">
           <el-radio-group v-model="temp.isLinkSprint" @change="linkSprint">
-            <el-radio :label='"0"'>
+            <el-radio :label="&quot;0&quot;">
               否
             </el-radio>
-            <el-radio :label='"1"'>
+            <el-radio :label="&quot;1&quot;">
               是
             </el-radio>
           </el-radio-group>
@@ -185,8 +187,7 @@
         <el-form-item label="邮箱" prop="mail">
           <el-input v-model="temp.mail" :disabled="true"/>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-        </el-form-item>
+        <el-form-item label="状态" prop="status"/>
         <el-form-item label="描述">
           <el-input
             v-model="temp.desc"
@@ -292,23 +293,9 @@
       }
     },
     data() {
-      const validateUsername = (rule, value, callback) => {
+      const validateTitle = (rule, value, callback) => {
         if (value.length === 0) {
-          callback(new Error('用户名不能为空'))
-        } else {
-          callback()
-        }
-      }
-      const validatePhone = (rule, value, callback) => {
-        if (value.length === 0) {
-          callback(new Error('手机号不能为空'))
-        } else {
-          callback()
-        }
-      }
-      const validateMail = (rule, value, callback) => {
-        if (value.length === 0) {
-          callback(new Error('邮箱不能为空'))
+          callback(new Error('标题不能为空'))
         } else {
           callback()
         }
@@ -342,10 +329,12 @@
           {value: '2', label: '重要'},
           {value: '3', label: '关键'}
         ],
-        createUserRules: {
-          name: [{required: true, trigger: 'blur', validator: validateUsername}],
-          phone: [{required: true, trigger: 'blur', validator: validatePhone}],
-          mail: [{required: true, trigger: 'blur', validator: validateMail}]
+        createBacklogRules: {
+          title: [{required: true, trigger: 'blur', validator: validateTitle}],
+          statusId: [{required: true, trigger: 'blur'}],
+          currentUserId: [{required: true, trigger: 'blur'}],
+          priority: [{required: true, trigger: 'blur'}],
+          importance: [{required: true, trigger: 'blur'}]
         },
         showIsLinkSprint: false,
         linkSprintId: '',
@@ -362,8 +351,8 @@
         updateFormVisible: false,
         dialogStatus: '',
         textMap: {
-          update: '编辑用户',
-          create: '添加用户'
+          update: '编辑backlog',
+          create: '添加backlog'
         },
         temp: {
           id: undefined,
@@ -436,12 +425,13 @@
           moduleId: '',
           sprintId: '',
           isLinkSprint: '0',
-          priorityOrder: '',
-          priority: '',
-          importance: '',
+          priorityOrder: '1',
+          priority: '1',
+          importance: '1',
           beginDate: '',
           endDate: ''
         }
+        this.showIsLinkSprint = false
       },
       initTemp(row) {
         this.temp = {
