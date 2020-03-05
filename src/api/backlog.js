@@ -22,3 +22,11 @@ export function deleteBacklog(backlogId) {
     method: 'delete'
   })
 }
+
+export function updateBacklog(param) {
+  return request({
+    url: 'http://localhost:8080/backlogs/' + param.id,
+    method: 'put',
+    params: param
+  })
+}

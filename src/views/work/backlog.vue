@@ -23,7 +23,7 @@
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="left" width="370px" label="标题">
+      <el-table-column align="left" width="340px" label="标题">
         <template slot-scope="scope">
           <el-tag :type="scope.row.type | typeTagFilter">{{ scope.row.type | typeFilter }}</el-tag>
           <span v-if="scope.row.moduleName === null || scope.row.moduleName === ''">{{ scope.row.title }}</span>
@@ -44,26 +44,26 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="120px" label="优先级顺序">
+      <el-table-column align="center" width="100px" label="优先级顺序">
         <template slot-scope="scope">
           <span>{{ scope.row.priorityOrder }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="120px" label="优先级">
+      <el-table-column align="center" width="100px" label="优先级">
         <template slot-scope="scope">
           <el-tag :type="scope.row.priority | priorityTagFilter">{{ scope.row.priority | priorityFilter }}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="120px" label="重要程度">
+      <el-table-column align="center" width="100px" label="重要程度">
         <template slot-scope="scope">
           <el-tag :type="scope.row.importance | importanceTagFilter">{{ scope.row.importance | importanceFilter }}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" width="120px" label="状态">
+      <el-table-column align="center" width="100px" label="状态">
         <template slot-scope="scope">
           <span>{{ scope.row.statusName }}</span>
         </template>
@@ -75,10 +75,17 @@
         </template>
       </el-table-column>
 
+      <el-table-column align="center" width="100px" label="预计结束日期">
+        <template slot-scope="scope">
+          <span v-if="scope.row.endDate === null || scope.row.endDate === ''">--</span>
+          <span v-else>{{ scope.row.endDate }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column align="center" min-width="100px" label="操作">
         <template slot-scope="{row, $index}">
-          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)" />
-          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)" />
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleUpdate(row, $index)"/>
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(row, $index)"/>
         </template>
       </el-table-column>
     </el-table>
@@ -102,30 +109,30 @@
       >
         <el-form-item label="类型" prop="type">
           <el-select v-model="temp.type" class="filter-item">
-            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title" placeholder="请输入标题" />
+          <el-input v-model="temp.title" placeholder="请输入标题"/>
         </el-form-item>
         <el-form-item label="状态" prop="statusId">
           <el-select v-model="temp.statusId" class="filter-item" placeholder="">
-            <el-option v-for="item in statusOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in statusOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="处理人" prop="currentUserId">
           <el-select v-model="temp.currentUserId" class="filter-item" placeholder="">
-            <el-option v-for="item in currentUserOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in currentUserOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="模块" prop="moduleId">
           <el-select v-model="temp.moduleId" class="filter-item" placeholder="">
-            <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="迭代" prop="sprintId">
           <el-select v-model="temp.sprintId" class="filter-item" placeholder="" clearable @change="choseSprint">
-            <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
         <el-form-item v-show="showIsLinkSprint" label="是否联动预计开始结束日期？" prop="isLinkSprint">
@@ -139,24 +146,24 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="预计开始日期" prop="beginDate">
-          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期" />
+          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期"/>
         </el-form-item>
         <el-form-item label="预计结束日期" prop="endDate">
-          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期" />
+          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期"/>
         </el-form-item>
         <el-form-item label="优先级顺序" prop="priorityOrder">
           <el-select v-model="temp.priorityOrder" class="filter-item" placeholder="">
-            <el-option v-for="item in priorityOrderOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in priorityOrderOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="优先级" prop="priority">
           <el-select v-model="temp.priority" class="filter-item" placeholder="">
-            <el-option v-for="item in priorityOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in priorityOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="重要程度" prop="importance">
           <el-select v-model="temp.importance" class="filter-item" placeholder="">
-            <el-option v-for="item in importanceOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in importanceOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -175,33 +182,74 @@
         ref="updateForm"
         :model="temp"
         label-position="left"
-        label-width="70px"
+        label-width="150px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="temp.name" :disabled="true" />
+        <el-form-item label="类型" prop="type">
+          <el-select v-model="temp.type" class="filter-item" disabled="true">
+            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
         </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" :disabled="true" />
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="temp.title" placeholder="请输入标题"/>
         </el-form-item>
-        <el-form-item label="邮箱" prop="mail">
-          <el-input v-model="temp.mail" :disabled="true" />
+        <el-form-item label="状态" prop="statusId">
+          <el-select v-model="temp.statusId" class="filter-item" placeholder="">
+            <el-option v-for="item in statusOptions" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
         </el-form-item>
-        <el-form-item label="状态" prop="status" />
-        <el-form-item label="描述">
-          <el-input
-            v-model="temp.desc"
-            :autosize="{ minRows: 2, maxRows: 4 }"
-            type="textarea"
-            placeholder="描述（选填）"
-          />
+        <el-form-item label="处理人" prop="currentUserId">
+          <el-select v-model="temp.currentUserId" class="filter-item" placeholder="">
+            <el-option v-for="item in currentUserOptions" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="模块" prop="moduleId">
+          <el-select v-model="temp.moduleId" class="filter-item" placeholder="">
+            <el-option v-for="item in moduleOptions" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="迭代" prop="sprintId">
+          <el-select v-model="temp.sprintId" class="filter-item" placeholder="" clearable @change="choseSprint">
+            <el-option v-for="item in sprintOptions" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否联动预计开始结束日期？" prop="isLinkSprint">
+          <el-radio-group v-model="temp.isLinkSprint" @change="linkSprint">
+            <el-radio :label="&quot;0&quot;">
+              否
+            </el-radio>
+            <el-radio :label="&quot;1&quot;">
+              是
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="预计开始日期" prop="beginDate">
+          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期"/>
+        </el-form-item>
+        <el-form-item label="预计结束日期" prop="endDate">
+          <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期"/>
+        </el-form-item>
+        <el-form-item label="优先级顺序" prop="priorityOrder">
+          <el-select v-model="temp.priorityOrder" class="filter-item" placeholder="">
+            <el-option v-for="item in priorityOrderOptions" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="优先级" prop="priority">
+          <el-select v-model="temp.priority" class="filter-item" placeholder="">
+            <el-option v-for="item in priorityOptions" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="重要程度" prop="importance">
+          <el-select v-model="temp.importance" class="filter-item" placeholder="">
+            <el-option v-for="item in importanceOptions" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="updateUser()">
+        <el-button type="primary" @click="updateBacklog()">
           保存
         </el-button>
       </div>
@@ -210,17 +258,16 @@
 </template>
 
 <script>
-  import { createUser, fetchUserList, deleteUser, updateUser } from '@/api/user'
-  import { fetchOptions } from '@/api/options'
-  import { createBacklog, fetchBacklogList, deleteBacklog } from '@/api/backlog'
+  import {fetchOptions} from '@/api/options'
+  import {createBacklog, fetchBacklogList, deleteBacklog, updateBacklog} from '@/api/backlog'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
   // type
   // story/bug
   const typeOptions = [
-    { value: '0', label: 'story' },
-    { value: '1', label: 'bug' }
+    {value: '0', label: 'story'},
+    {value: '1', label: 'bug'}
   ]
 
   const typeKeyValue = typeOptions.reduce((acc, cur) => {
@@ -230,9 +277,9 @@
 
   // 优先级
   const priorityOptions = [
-    { value: '0', label: '低' },
-    { value: '1', label: '中' },
-    { value: '2', label: '高' }
+    {value: '0', label: '低'},
+    {value: '1', label: '中'},
+    {value: '2', label: '高'}
   ]
 
   const priorityKeyValue = priorityOptions.reduce((acc, cur) => {
@@ -242,10 +289,10 @@
 
   // 重要程度
   const importanceOptions = [
-    { value: '0', label: '提示' },
-    { value: '1', label: '一般' },
-    { value: '2', label: '重要' },
-    { value: '3', label: '关键' }
+    {value: '0', label: '提示'},
+    {value: '1', label: '一般'},
+    {value: '2', label: '重要'},
+    {value: '3', label: '关键'}
   ]
 
   const importanceKeyValue = importanceOptions.reduce((acc, cur) => {
@@ -255,8 +302,8 @@
 
   export default {
     name: 'Backlog',
-    components: { Pagination },
-    directives: { waves },
+    components: {Pagination},
+    directives: {waves},
     filters: {
       typeFilter(type) {
         return typeKeyValue[type]
@@ -307,34 +354,34 @@
         sprintOptions: null,
         priorityOptions,
         typeOptions: [
-          { value: '0', label: 'story' },
-          { value: '1', label: 'bug' }
+          {value: '0', label: 'story'},
+          {value: '1', label: 'bug'}
         ],
         priorityOrderOptions: [
-          { value: '1', label: '1' },
-          { value: '2', label: '2' },
-          { value: '3', label: '3' },
-          { value: '4', label: '4' },
-          { value: '5', label: '5' },
-          { value: '6', label: '6' },
-          { value: '7', label: '7' },
-          { value: '8', label: '8' },
-          { value: '9', label: '9' },
-          { value: '10', label: '10' }
+          {value: '1', label: '1'},
+          {value: '2', label: '2'},
+          {value: '3', label: '3'},
+          {value: '4', label: '4'},
+          {value: '5', label: '5'},
+          {value: '6', label: '6'},
+          {value: '7', label: '7'},
+          {value: '8', label: '8'},
+          {value: '9', label: '9'},
+          {value: '10', label: '10'}
         ],
 
         importanceOptions: [
-          { value: '0', label: '提示' },
-          { value: '1', label: '一般' },
-          { value: '2', label: '重要' },
-          { value: '3', label: '关键' }
+          {value: '0', label: '提示'},
+          {value: '1', label: '一般'},
+          {value: '2', label: '重要'},
+          {value: '3', label: '关键'}
         ],
         createBacklogRules: {
-          title: [{ required: true, trigger: 'blur', validator: validateTitle }],
-          statusId: [{ required: true, trigger: 'blur' }],
-          currentUserId: [{ required: true, trigger: 'blur' }],
-          priority: [{ required: true, trigger: 'blur' }],
-          importance: [{ required: true, trigger: 'blur' }]
+          title: [{required: true, trigger: 'blur', validator: validateTitle}],
+          statusId: [{required: true, trigger: 'blur'}],
+          currentUserId: [{required: true, trigger: 'blur'}],
+          priority: [{required: true, trigger: 'blur'}],
+          importance: [{required: true, trigger: 'blur'}]
         },
         showIsLinkSprint: false,
         linkSprintId: '',
@@ -436,12 +483,18 @@
       initTemp(row) {
         this.temp = {
           id: row.id,
-          name: row.name,
-          phone: row.phone,
-          mail: row.mail,
-          desc: row.desc,
-          status: row.status,
-          createTime: row.createTime
+          title: row.title,
+          type: row.type,
+          statusId: row.statusId,
+          currentUserId: row.currentUserId,
+          moduleId: row.moduleId,
+          sprintId: row.sprintId,
+          isLinkSprint: row.isLinkSprint,
+          priorityOrder: row.priorityOrder,
+          priority: row.priority,
+          importance: row.importance,
+          beginDate: row.beginDate,
+          endDate: row.endDate
         }
       },
       handleCreate() {
@@ -460,9 +513,17 @@
         })
       },
       handleUpdate(row, index) {
-        this.initTemp(row)
         this.dialogStatus = 'update'
         this.updateFormVisible = true
+        fetchOptions(this.listQuery).then(response => {
+          const res = response.data
+          this.currentUserOptions = res.currentUserList
+          this.statusOptions = res.statusList
+          this.moduleOptions = res.moduleList
+          this.sprintOptions = res.sprintList
+
+          this.initTemp(row)
+        })
       },
       handleDelete(row, index) {
         this.$confirm('确定要删除这条工作项?', {
@@ -470,7 +531,7 @@
           cancelButtonText: '否',
           type: 'error'
         })
-          .then(async() => {
+          .then(async () => {
             this.backlogId = row.id
             deleteBacklog(row.id).then(response => {
               const code = response.status
@@ -519,10 +580,10 @@
           }
         })
       },
-      updateUser() {
+      updateBacklog() {
         this.$refs['updateForm'].validate((valid) => {
           if (valid) {
-            updateUser(this.temp).then(response => {
+            updateBacklog(this.temp).then(response => {
               this.updateFormVisible = false
               const code = response.status
               if (code === 200) {
@@ -532,7 +593,7 @@
                   duration: 2000
                 })
                 const index = this.list.findIndex(v => v.id === this.temp.id)
-                this.list.splice(index, 1, this.temp)
+                this.list.splice(index, 1, response.data)
               } else {
                 this.$notify({
                   message: '编辑失败',
