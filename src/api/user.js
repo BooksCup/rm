@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { base_url } from '@/utils/config'
 
 export function login(data) {
   return request({
@@ -12,7 +13,7 @@ export function getInfo(token) {
   return request({
     url: '/vue-element-admin/user/info',
     method: 'get',
-    params: {token}
+    params: { token }
   })
 }
 
@@ -23,32 +24,36 @@ export function logout() {
   })
 }
 
+// 获取用户列表
 export function fetchUserList(query) {
   return request({
-    url: 'http://localhost:8080/users',
+    url: base_url + 'users',
     method: 'get',
     params: query
   })
 }
 
+// 创建用户
 export function createUser(data) {
   return request({
-    url: 'http://localhost:8080/users',
+    url: base_url + 'users',
     method: 'post',
     params: data
   })
 }
 
+// 删除用户
 export function deleteUser(userId) {
   return request({
-    url: 'http://localhost:8080/users/' + userId,
+    url: base_url + 'users/' + userId,
     method: 'delete'
   })
 }
 
+// 编辑用户
 export function updateUser(param) {
   return request({
-    url: 'http://localhost:8080/users/' + param.id,
+    url: base_url + 'users/' + param.id,
     method: 'put',
     params: param
   })
