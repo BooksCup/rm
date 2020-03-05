@@ -56,7 +56,7 @@
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
@@ -79,7 +79,12 @@
           <el-input v-model="temp.desc" placeholder="请输入描述" />
         </el-form-item>
         <el-form-item label="开始日期" prop="beginDate">
-          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期" />
+          <el-date-picker
+            v-model="temp.beginDate"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            placeholder="请选择开始日期"
+          />
         </el-form-item>
         <el-form-item label="结束日期" prop="endDate">
           <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期" />
@@ -110,7 +115,12 @@
           <el-input v-model="temp.desc" placeholder="请输入描述" />
         </el-form-item>
         <el-form-item label="开始日期" prop="beginDate">
-          <el-date-picker v-model="temp.beginDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择开始日期" />
+          <el-date-picker
+            v-model="temp.beginDate"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            placeholder="请选择开始日期"
+          />
         </el-form-item>
         <el-form-item label="结束日期" prop="endDate">
           <el-date-picker v-model="temp.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="请选择结束日期" />
@@ -218,7 +228,7 @@
           this.$refs['dataForm'].clearValidate()
         })
       },
-      handleUpdate(row, index) {
+      handleUpdate(row) {
         this.initTemp(row)
         this.dialogStatus = 'update'
         this.updateFormVisible = true
@@ -306,15 +316,3 @@
     }
   }
 </script>
-
-<style scoped>
-  .edit-input {
-    padding-right: 100px;
-  }
-
-  .cancel-btn {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-  }
-</style>

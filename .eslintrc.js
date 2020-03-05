@@ -57,6 +57,7 @@ module.exports = {
     //   'SwitchCase': 1
     // }],
     'indent':0,
+    'linebreak-style': [0, 'error', 'windows'],
     'jsx-quotes': [2, 'prefer-single'],
     'key-spacing': [2, {
       'beforeColon': false,
