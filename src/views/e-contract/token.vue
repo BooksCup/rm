@@ -1,9 +1,9 @@
 <template>
   <div class="createPost-container">
-    <el-form ref="postForm" :model="temp" :rules="rules" class="form-container">
+    <el-form ref="postForm" v-loading="loadingData" :model="temp" :rules="rules" class="form-container">
 
       <sticky :z-index="10" :class-name="'sub-navbar ' + 'draft'">
-        <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
+        <el-button style="margin-left: 10px;" type="success" @click="submitForm">
           生成token
         </el-button>
       </sticky>
@@ -87,6 +87,7 @@
           createTime: ''
         },
         loading: false,
+        loadingData: false,
         userListOptions: [],
         rules: {
           image_uri: [{ validator: validateRequire }],
@@ -119,10 +120,10 @@
     },
     methods: {
       fetchData() {
+        this.loadingData = true
         fetchToken().then(response => {
           this.temp = response.data
-        }).catch(err => {
-          console.log(err)
+          this.loadingData = false
         })
       },
       setTagsViewTitle() {
@@ -135,6 +136,7 @@
         document.title = `${title} - ${this.postForm.id}`
       },
       submitForm() {
+        this.loadingData = true
         this.$refs.postForm.validate(valid => {
           if (valid) {
             this.loading = true
@@ -157,9 +159,10 @@
                 })
               }
             })
-            this.loading = false
+            this.loadingData = false
           } else {
             console.log('error submit!!')
+            this.loadingData = false
             return false
           }
         })

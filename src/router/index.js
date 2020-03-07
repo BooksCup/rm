@@ -142,11 +142,11 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'setting',
-        component: () => import('@/views/e-contract/setting'),
-        name: 'Setting',
+        path: 'token',
+        component: () => import('@/views/e-contract/token'),
+        name: 'Token',
         meta: {
-          title: '设置'
+          title: 'token'
         }
       }
     ]
