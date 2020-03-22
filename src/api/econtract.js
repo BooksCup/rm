@@ -37,3 +37,11 @@ export function createAccount(data) {
   })
 }
 
+// 删除个人账号
+export function deleteAccount(accountId) {
+  return request({
+    url: base_url + 'econtractAccount/' + accountId,
+    method: 'delete'
+  })
+}
+

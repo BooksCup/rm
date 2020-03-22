@@ -168,8 +168,8 @@
 </template>
 
 <script>
-  import { deleteUser, updateUser } from '@/api/user'
-  import { createAccount, fetchAccount } from '../../api/econtract'
+  import { updateUser } from '@/api/user'
+  import { createAccount, fetchAccount, deleteAccount } from '../../api/econtract'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -243,7 +243,7 @@
           type: '',
           status: '0'
         },
-        userId: ''
+        accountId: ''
       }
     },
     created() {
@@ -304,8 +304,8 @@
           type: 'error'
         })
           .then(async() => {
-            this.userId = row.id
-            deleteUser(row.id).then(response => {
+            this.accountId = row.id
+            deleteAccount(row.id).then(response => {
               console.log(response)
               const code = response.status
               if (code === 200) {
