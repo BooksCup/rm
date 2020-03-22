@@ -45,3 +45,12 @@ export function deleteAccount(accountId) {
   })
 }
 
+// 编辑用户
+export function updateAccount(param) {
+  return request({
+    url: base_url + 'econtractAccount/' + param.id,
+    method: 'put',
+    params: param
+  })
+}
+

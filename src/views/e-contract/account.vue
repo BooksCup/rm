@@ -127,39 +127,30 @@
         label-width="70px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="temp.name" :disabled="true" />
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" :disabled="true" />
+        <el-form-item label="第三方账号" prop="thirdPartyUserId">
+          <el-input v-model="temp.thirdPartyUserId" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="mail">
-          <el-input v-model="temp.mail" :disabled="true" />
+        <el-form-item label="证件类型" prop="idType">
+          <el-input v-model="temp.idType" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="temp.status">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
+        <el-form-item label="证件号" prop="idNumber">
+          <el-input v-model="temp.idNumber" :disabled="true" />
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input
-            v-model="temp.desc"
-            :autosize="{ minRows: 2, maxRows: 4 }"
-            type="textarea"
-            placeholder="描述（选填）"
-          />
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="temp.mobile" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="temp.email" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="updateUser()">
+        <el-button type="primary" @click="updateAccount()">
           保存
         </el-button>
       </div>
@@ -168,8 +159,7 @@
 </template>
 
 <script>
-  import { updateUser } from '@/api/user'
-  import { createAccount, fetchAccount, deleteAccount } from '../../api/econtract'
+  import { createAccount, fetchAccount, deleteAccount, updateAccount } from '../../api/econtract'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -231,8 +221,8 @@
         updateFormVisible: false,
         dialogStatus: '',
         textMap: {
-          update: '编辑用户',
-          create: '添加用户'
+          update: '编辑个人账号',
+          create: '添加个人账号'
         },
         temp: {
           id: undefined,
@@ -270,17 +260,19 @@
           idType: '',
           idNumber: '',
           mobile: '',
-          email: ''
+          email: '',
+          createTime: ''
         }
       },
       initTemp(row) {
         this.temp = {
           id: row.id,
           name: row.name,
-          phone: row.phone,
-          mail: row.mail,
-          desc: row.desc,
-          status: row.status,
+          thirdPartyUserId: row.thirdPartyUserId,
+          idType: row.idType,
+          idNumber: row.idNumber,
+          mobile: row.mobile,
+          email: row.email,
           createTime: row.createTime
         }
       },
@@ -353,10 +345,10 @@
           }
         })
       },
-      updateUser() {
+      updateAccount() {
         this.$refs['updateForm'].validate((valid) => {
           if (valid) {
-            updateUser(this.temp).then(response => {
+            updateAccount(this.temp).then(response => {
               this.updateFormVisible = false
               const code = response.status
               if (code === 200) {
@@ -374,6 +366,13 @@
                   duration: 2000
                 })
               }
+            }).catch(err => {
+              const errorMsg = err.response.data.apiResultMessage
+              this.$notify({
+                message: '编辑失败:' + errorMsg,
+                type: 'error',
+                duration: 2000
+              })
             })
           }
         })
