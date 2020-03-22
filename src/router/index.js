@@ -142,6 +142,14 @@ export const asyncRoutes = [
     },
     children: [
       {
+        path: 'account',
+        component: () => import('@/views/e-contract/account'),
+        name: 'account',
+        meta: {
+          title: '个人账号'
+        }
+      },
+      {
         path: 'token',
         component: () => import('@/views/e-contract/token'),
         name: 'Token',

@@ -18,3 +18,22 @@ export function addToken(data) {
     params: data
   })
 }
+
+// 获取个人账号
+export function fetchAccount(query) {
+  return request({
+    url: base_url + 'econtractAccount',
+    method: 'get',
+    params: query
+  })
+}
+
+// 新增个人账号
+export function createAccount(data) {
+  return request({
+    url: base_url + 'econtractAccount',
+    method: 'post',
+    params: data
+  })
+}
+
