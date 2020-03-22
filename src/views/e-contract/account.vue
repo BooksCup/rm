@@ -37,7 +37,7 @@
 
       <el-table-column align="center" width="180px" label="证件类型">
         <template slot-scope="scope">
-          <span>{{ scope.row.idType }}</span>
+          <span>{{ scope.row.idType | idTypeFilter }}</span>
         </template>
       </el-table-column>
 
@@ -84,7 +84,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="createFormVisible">
       <el-form
         ref="dataForm"
-        :rules="createUserRules"
+        :rules="createAccountRules"
         :model="temp"
         label-position="left"
         label-width="70px"
@@ -97,7 +97,9 @@
           <el-input v-model="temp.thirdPartyUserId" placeholder="第三方账号(必填)" />
         </el-form-item>
         <el-form-item label="证件类型" prop="idType">
-          <el-input v-model="temp.idType" placeholder="证件类型(必填)" />
+          <el-select v-model="temp.idType" class="filter-item">
+            <el-option v-for="item in idTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
         <el-form-item label="证件号" prop="idNumber">
           <el-input v-model="temp.idNumber" placeholder="证件号(必填)" />
@@ -163,35 +165,68 @@
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
+  const idTypeOptions = [
+    { value: 'CRED_PSN_CH_IDCARD', label: '大陆身份证' },
+    { value: 'CRED_PSN_CH_TWCARD', label: '台湾来往大陆通行证' },
+    { value: 'CRED_PSN_CH_MACAO', label: '澳门来往大陆通行证' },
+    { value: 'CRED_PSN_CH_HONGKONG', label: '香港来往大陆通行证' },
+    { value: 'CRED_PSN_FOREIGN', label: '外籍证件' },
+    { value: 'CRED_PSN_PASSPORT', label: '护照' },
+    { value: 'CRED_PSN_CH_SOLDIER_IDCARD', label: '军官证' },
+    { value: 'CRED_PSN_CH_SSCARD', label: '社会保障卡' },
+    { value: 'CRED_PSN_CH_ARMED_POLICE_IDCARD', label: '武装警察身份证件' },
+    { value: 'CRED_PSN_CH_RESIDENCE_BOOKLET', label: '户口簿' },
+    { value: 'CRED_PSN_CH_TEMPORARY_IDCARD', label: '临时居民身份证' },
+    { value: 'CRED_PSN_CH_GREEN_CARD', label: '外国人永久居留证' },
+    { value: 'CRED_PSN_SHAREHOLDER_CODE', label: '股东代码证' },
+    { value: 'CRED_PSN_POLICE_ID_CARD', label: '警官证' },
+    { value: 'CRED_PSN_UNKNOWN', label: '未知类型' }
+  ]
+
+  const idTypeKeyValue = idTypeOptions.reduce((acc, cur) => {
+    acc[cur.value] = cur.label
+    return acc
+  }, {})
+
   export default {
     name: 'EcontractAccount',
     components: { Pagination },
     directives: { waves },
     filters: {
-      statusFilter(status) {
-        const statusMap = {
-          0: '启用',
-          1: '停用'
-        }
-        return statusMap[status]
+      idTypeFilter(type) {
+        return idTypeKeyValue[type]
       }
     },
     data() {
-      const validateUsername = (rule, value, callback) => {
+      const validateName = (rule, value, callback) => {
         if (value.length === 0) {
-          callback(new Error('用户名不能为空'))
+          callback(new Error('姓名不能为空'))
         } else {
           callback()
         }
       }
-      const validatePhone = (rule, value, callback) => {
+      const validateThirdPartyUserId = (rule, value, callback) => {
         if (value.length === 0) {
-          callback(new Error('手机号不能为空'))
+          callback(new Error('第三方账号不能为空'))
         } else {
           callback()
         }
       }
-      const validateMail = (rule, value, callback) => {
+      const validateIdNumber = (rule, value, callback) => {
+        if (value.length === 0) {
+          callback(new Error('证件号不能为空'))
+        } else {
+          callback()
+        }
+      }
+      const validateMobile = (rule, value, callback) => {
+        if (value.length === 0) {
+          callback(new Error('手机不能为空'))
+        } else {
+          callback()
+        }
+      }
+      const validateEmail = (rule, value, callback) => {
         if (value.length === 0) {
           callback(new Error('邮箱不能为空'))
         } else {
@@ -199,14 +234,17 @@
         }
       }
       return {
+        idTypeOptions,
         options: [
           { value: '0', label: '启用' },
           { value: '1', label: '停用' }
         ],
-        createUserRules: {
-          name: [{ required: true, trigger: 'blur', validator: validateUsername }],
-          phone: [{ required: true, trigger: 'blur', validator: validatePhone }],
-          mail: [{ required: true, trigger: 'blur', validator: validateMail }]
+        createAccountRules: {
+          name: [{ required: true, trigger: 'blur', validator: validateName }],
+          thirdPartyUserId: [{ required: true, trigger: 'blur', validator: validateThirdPartyUserId }],
+          idNumber: [{ required: true, trigger: 'blur', validator: validateIdNumber }],
+          mobile: [{ required: true, trigger: 'blur', validator: validateMobile }],
+          email: [{ required: true, trigger: 'blur', validator: validateEmail }]
         },
         tableKey: 0,
         pvData: [],
@@ -257,7 +295,7 @@
         this.temp = {
           name: '',
           thirdPartyUserId: '',
-          idType: '',
+          idType: 'CRED_PSN_CH_IDCARD',
           idNumber: '',
           mobile: '',
           email: '',
@@ -341,6 +379,13 @@
                   duration: 2000
                 })
               }
+            }).catch(error => {
+              const errorMsg = error.response.data.apiResultMessage
+              this.$notify({
+                message: '创建失败:' + errorMsg,
+                type: 'error',
+                duration: 2000
+              })
             })
           }
         })
@@ -366,8 +411,8 @@
                   duration: 2000
                 })
               }
-            }).catch(err => {
-              const errorMsg = err.response.data.apiResultMessage
+            }).catch(error => {
+              const errorMsg = error.response.data.apiResultMessage
               this.$notify({
                 message: '编辑失败:' + errorMsg,
                 type: 'error',
