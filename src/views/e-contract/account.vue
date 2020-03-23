@@ -87,27 +87,27 @@
         :rules="createAccountRules"
         :model="temp"
         label-position="left"
-        label-width="70px"
+        label-width="100px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="姓名" prop="name">
+        <el-form-item label="姓名:" prop="name">
           <el-input v-model="temp.name" placeholder="姓名(必填)" />
         </el-form-item>
-        <el-form-item label="第三方账号" prop="thirdPartyUserId">
+        <el-form-item label="第三方账号:" prop="thirdPartyUserId">
           <el-input v-model="temp.thirdPartyUserId" placeholder="第三方账号(必填)" />
         </el-form-item>
-        <el-form-item label="证件类型" prop="idType">
+        <el-form-item label="证件类型:" prop="idType">
           <el-select v-model="temp.idType" class="filter-item">
             <el-option v-for="item in idTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="证件号" prop="idNumber">
+        <el-form-item label="证件号:" prop="idNumber">
           <el-input v-model="temp.idNumber" placeholder="证件号(必填)" />
         </el-form-item>
-        <el-form-item label="手机" prop="mobile">
+        <el-form-item label="手机:" prop="mobile">
           <el-input v-model="temp.mobile" placeholder="手机(必填)" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱:" prop="email">
           <el-input v-model="temp.email" placeholder="邮箱(选填)" />
         </el-form-item>
       </el-form>
@@ -124,6 +124,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="updateFormVisible">
       <el-form
         ref="updateForm"
+        :rules="createAccountRules"
         :model="temp"
         label-position="left"
         label-width="70px"
@@ -136,7 +137,9 @@
           <el-input v-model="temp.thirdPartyUserId" />
         </el-form-item>
         <el-form-item label="证件类型" prop="idType">
-          <el-input v-model="temp.idType" />
+          <el-select v-model="temp.idType" class="filter-item" disabled="true">
+            <el-option v-for="item in idTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
         <el-form-item label="证件号" prop="idNumber">
           <el-input v-model="temp.idNumber" :disabled="true" />
@@ -235,10 +238,6 @@
       }
       return {
         idTypeOptions,
-        options: [
-          { value: '0', label: '启用' },
-          { value: '1', label: '停用' }
-        ],
         createAccountRules: {
           name: [{ required: true, trigger: 'blur', validator: validateName }],
           thirdPartyUserId: [{ required: true, trigger: 'blur', validator: validateThirdPartyUserId }],
@@ -263,13 +262,14 @@
           create: '添加个人账号'
         },
         temp: {
-          id: undefined,
-          importance: 1,
-          remark: '',
-          timestamp: new Date(),
-          title: '',
-          type: '',
-          status: '0'
+          id: '',
+          name: '',
+          thirdPartyUserId: '',
+          idType: 'CRED_PSN_CH_IDCARD',
+          idNumber: '',
+          mobile: '',
+          email: '',
+          createTime: ''
         },
         accountId: ''
       }
@@ -293,6 +293,7 @@
       },
       resetTemp() {
         this.temp = {
+          id: '',
           name: '',
           thirdPartyUserId: '',
           idType: 'CRED_PSN_CH_IDCARD',
