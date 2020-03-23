@@ -137,7 +137,7 @@
           <el-input v-model="temp.thirdPartyUserId" />
         </el-form-item>
         <el-form-item label="证件类型" prop="idType">
-          <el-select v-model="temp.idType" class="filter-item" disabled="true">
+          <el-select v-model="temp.idType" class="filter-item" :disabled="true">
             <el-option v-for="item in idTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -353,11 +353,13 @@
                   duration: 2000
                 })
               }
-              console.log(response)
+            }).catch(error => {
+              this.$notify({
+                message: '删除失败',
+                type: 'error',
+                duration: 2000
+              })
             })
-          })
-          .catch(err => {
-            console.error(err)
           })
       },
       createAccount() {
