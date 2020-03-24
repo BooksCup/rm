@@ -150,6 +150,14 @@ export const asyncRoutes = [
         }
       },
       {
+        path: 'org',
+        component: () => import('@/views/e-contract/org'),
+        name: 'org',
+        meta: {
+          title: '机构账号'
+        }
+      },
+      {
         path: 'token',
         component: () => import('@/views/e-contract/token'),
         name: 'Token',

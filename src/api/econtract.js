@@ -45,7 +45,7 @@ export function deleteAccount(accountId) {
   })
 }
 
-// 编辑用户
+// 编辑个人账号
 export function updateAccount(param) {
   return request({
     url: base_url + 'econtractAccount/' + param.id,
@@ -54,3 +54,11 @@ export function updateAccount(param) {
   })
 }
 
+// 获取机构账号
+export function fetchOrg(query) {
+  return request({
+    url: base_url + 'econtractOrg',
+    method: 'get',
+    params: query
+  })
+}
