@@ -93,16 +93,20 @@
         :rules="createAccountRules"
         :model="temp"
         label-position="left"
-        label-width="100px"
+        label-width="120px"
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="机构名称:" prop="name">
           <el-input v-model="temp.name" placeholder="机构名称(必填)" />
         </el-form-item>
-        <el-form-item label="创建者:" class="postInfo-container-item">
-          <el-select v-model="temp.creator" :remote-method="getRemoteUserList" filterable
-                     default-first-option remote
-                     placeholder="查找用户"
+        <el-form-item label="创建者:" class="postInfo-container-item" prop="creator">
+          <el-select
+            v-model="temp.creator"
+            :remote-method="getRemoteUserList"
+            filterable
+            default-first-option
+            remote
+            placeholder="查找个人账号"
           >
             <el-option v-for="item in userListOptions" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
@@ -119,10 +123,10 @@
           <el-input v-model="temp.idNumber" placeholder="证件号(必填)" />
         </el-form-item>
         <el-form-item label="企业法人名称:" prop="orgLegalName">
-          <el-input v-model="temp.orgLegalName" placeholder="企业法人名称(必填)" />
+          <el-input v-model="temp.orgLegalName" placeholder="企业法人名称(选填)" />
         </el-form-item>
         <el-form-item label="企业法人证件号:" prop="orgLegalIdNumber">
-          <el-input v-model="temp.orgLegalIdNumber" placeholder="企业法人证件号(必填)" />
+          <el-input v-model="temp.orgLegalIdNumber" placeholder="企业法人证件号(选填)" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -141,16 +145,16 @@
         :rules="createAccountRules"
         :model="temp"
         label-position="left"
-        label-width="70px"
+        label-width="120px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="姓名" prop="name">
+        <el-form-item label="机构名称:" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="第三方账号" prop="thirdPartyUserId">
+        <el-form-item label="第三方账号:" prop="thirdPartyUserId">
           <el-input v-model="temp.thirdPartyUserId" />
         </el-form-item>
-        <el-form-item label="证件类型" prop="idType">
+        <el-form-item label="证件类型:" prop="idType">
           <el-select v-model="temp.idType" class="filter-item" :disabled="true">
             <el-option v-for="item in idTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
@@ -159,17 +163,17 @@
           <el-input v-model="temp.idNumber" :disabled="true" />
         </el-form-item>
         <el-form-item label="企业法人名称:" prop="mobile">
-          <el-input v-model="temp.mobile" />
+          <el-input v-model="temp.orgLegalName" />
         </el-form-item>
         <el-form-item label="企业法人证件号:" prop="email">
-          <el-input v-model="temp.email" />
+          <el-input v-model="temp.orgLegalIdNumber" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="updateAccount()">
+        <el-button type="primary" @click="updateOrg()">
           保存
         </el-button>
       </div>
@@ -178,7 +182,7 @@
 </template>
 
 <script>
-  import { searchAccount, createOrg, fetchOrg, deleteAccount, updateAccount } from '../../api/econtract'
+  import { searchAccount, createOrg, fetchOrg, deleteOrg, updateOrg } from '../../api/econtract'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -215,7 +219,14 @@
     data() {
       const validateName = (rule, value, callback) => {
         if (value.length === 0) {
-          callback(new Error('姓名不能为空'))
+          callback(new Error('机构名称不能为空'))
+        } else {
+          callback()
+        }
+      }
+      const validateCreator = (rule, value, callback) => {
+        if (value.length === 0) {
+          callback(new Error('创建人不能为空'))
         } else {
           callback()
         }
@@ -234,32 +245,16 @@
           callback()
         }
       }
-      const validateMobile = (rule, value, callback) => {
-        if (value.length === 0) {
-          callback(new Error('手机不能为空'))
-        } else {
-          callback()
-        }
-      }
-      const validateEmail = (rule, value, callback) => {
-        if (value.length === 0) {
-          callback(new Error('邮箱不能为空'))
-        } else {
-          callback()
-        }
-      }
       return {
         userListOptions: [],
         idTypeOptions,
         createAccountRules: {
           name: [{ required: true, trigger: 'blur', validator: validateName }],
+          creator: [{ required: true, trigger: 'blur', validator: validateCreator }],
           thirdPartyUserId: [{ required: true, trigger: 'blur', validator: validateThirdPartyUserId }],
-          idNumber: [{ required: true, trigger: 'blur', validator: validateIdNumber }],
-          mobile: [{ required: true, trigger: 'blur', validator: validateMobile }],
-          email: [{ required: true, trigger: 'blur', validator: validateEmail }]
+          idNumber: [{ required: true, trigger: 'blur', validator: validateIdNumber }]
         },
         tableKey: 0,
-        pvData: [],
         list: null,
         total: 0,
         listLoading: true,
@@ -271,11 +266,11 @@
         updateFormVisible: false,
         dialogStatus: '',
         textMap: {
-          update: '编辑个人账号',
-          create: '添加个人账号'
+          update: '编辑机构账号',
+          create: '添加机构账号'
         },
         temp: {
-          id: '',
+          orgId: '',
           name: '',
           thirdPartyUserId: '',
           idType: 'CRED_ORG_USCC',
@@ -284,7 +279,7 @@
           email: '',
           createTime: ''
         },
-        accountId: ''
+        orgId: ''
       }
     },
     created() {
@@ -315,7 +310,7 @@
       },
       resetTemp() {
         this.temp = {
-          id: '',
+          orgId: '',
           name: '',
           creator: '',
           thirdPartyUserId: '',
@@ -328,13 +323,13 @@
       },
       initTemp(row) {
         this.temp = {
-          id: row.id,
+          orgId: row.orgId,
           name: row.name,
           thirdPartyUserId: row.thirdPartyUserId,
           idType: row.idType,
           idNumber: row.idNumber,
-          mobile: row.mobile,
-          email: row.email,
+          orgLegalName: row.orgLegalName,
+          orgLegalIdNumber: row.orgLegalIdNumber,
           createTime: row.createTime
         }
       },
@@ -358,8 +353,8 @@
           type: 'error'
         })
           .then(async() => {
-            this.accountId = row.id
-            deleteAccount(row.id).then(response => {
+            this.orgId = row.orgId
+            deleteOrg(row.orgId).then(response => {
               console.log(response)
               const code = response.status
               if (code === 200) {
@@ -416,10 +411,10 @@
           }
         })
       },
-      updateAccount() {
+      updateOrg() {
         this.$refs['updateForm'].validate((valid) => {
           if (valid) {
-            updateAccount(this.temp).then(response => {
+            updateOrg(this.temp).then(response => {
               this.updateFormVisible = false
               const code = response.status
               if (code === 200) {
@@ -428,7 +423,7 @@
                   type: 'success',
                   duration: 2000
                 })
-                const index = this.list.findIndex(v => v.id === this.temp.id)
+                const index = this.list.findIndex(v => v.orgId === this.temp.orgId)
                 this.list.splice(index, 1, this.temp)
               } else {
                 this.$notify({

@@ -63,7 +63,6 @@ export function searchAccount(query) {
   })
 }
 
-
 // 获取机构账号
 export function fetchOrg(query) {
   return request({
@@ -79,5 +78,22 @@ export function createOrg(data) {
     url: base_url + 'econtractOrg',
     method: 'post',
     params: data
+  })
+}
+
+// 删除机构账号
+export function deleteOrg(orgId) {
+  return request({
+    url: base_url + 'econtractOrg/' + orgId,
+    method: 'delete'
+  })
+}
+
+// 编辑机构账号
+export function updateOrg(param) {
+  return request({
+    url: base_url + 'econtractOrg/' + param.orgId,
+    method: 'put',
+    params: param
   })
 }
