@@ -150,6 +150,13 @@ export const asyncRoutes = [
         }
       },
       {
+        path: 'personal-seal/:id',
+        component: () => import('@/views/e-contract/personal-seal'),
+        name: 'personal-seal',
+        meta: { title: '个人印章', noCache: true, activeMenu: '/e-contract/account' },
+        hidden: true
+      },
+      {
         path: 'org',
         component: () => import('@/views/e-contract/org'),
         name: 'org',
