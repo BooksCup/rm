@@ -54,11 +54,30 @@ export function updateAccount(param) {
   })
 }
 
+// 查询个人账号
+export function searchAccount(query) {
+  return request({
+    url: base_url + 'econtractAccount/searchAccount',
+    method: 'get',
+    params: query
+  })
+}
+
+
 // 获取机构账号
 export function fetchOrg(query) {
   return request({
     url: base_url + 'econtractOrg',
     method: 'get',
     params: query
+  })
+}
+
+// 新增个人账号
+export function createOrg(data) {
+  return request({
+    url: base_url + 'econtractOrg',
+    method: 'post',
+    params: data
   })
 }

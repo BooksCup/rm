@@ -96,8 +96,16 @@
         label-width="100px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="姓名:" prop="name">
-          <el-input v-model="temp.name" placeholder="姓名(必填)" />
+        <el-form-item label="机构名称:" prop="name">
+          <el-input v-model="temp.name" placeholder="机构名称(必填)" />
+        </el-form-item>
+        <el-form-item label="创建者:" class="postInfo-container-item">
+          <el-select v-model="temp.creator" :remote-method="getRemoteUserList" filterable
+                     default-first-option remote
+                     placeholder="查找用户"
+          >
+            <el-option v-for="item in userListOptions" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="第三方账号:" prop="thirdPartyUserId">
           <el-input v-model="temp.thirdPartyUserId" placeholder="第三方账号(必填)" />
@@ -110,18 +118,18 @@
         <el-form-item label="证件号:" prop="idNumber">
           <el-input v-model="temp.idNumber" placeholder="证件号(必填)" />
         </el-form-item>
-        <el-form-item label="手机:" prop="mobile">
-          <el-input v-model="temp.mobile" placeholder="手机(必填)" />
+        <el-form-item label="企业法人名称:" prop="orgLegalName">
+          <el-input v-model="temp.orgLegalName" placeholder="企业法人名称(必填)" />
         </el-form-item>
-        <el-form-item label="邮箱:" prop="email">
-          <el-input v-model="temp.email" placeholder="邮箱(选填)" />
+        <el-form-item label="企业法人证件号:" prop="orgLegalIdNumber">
+          <el-input v-model="temp.orgLegalIdNumber" placeholder="企业法人证件号(必填)" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="createFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="createAccount()">
+        <el-button type="primary" @click="createOrg()">
           保存
         </el-button>
       </div>
@@ -147,13 +155,13 @@
             <el-option v-for="item in idTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="证件号" prop="idNumber">
+        <el-form-item label="证件号:" prop="idNumber">
           <el-input v-model="temp.idNumber" :disabled="true" />
         </el-form-item>
-        <el-form-item label="手机" prop="mobile">
+        <el-form-item label="企业法人名称:" prop="mobile">
           <el-input v-model="temp.mobile" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="企业法人证件号:" prop="email">
           <el-input v-model="temp.email" />
         </el-form-item>
       </el-form>
@@ -170,7 +178,7 @@
 </template>
 
 <script>
-  import { createAccount, fetchOrg, deleteAccount, updateAccount } from '../../api/econtract'
+  import { searchAccount, createOrg, fetchOrg, deleteAccount, updateAccount } from '../../api/econtract'
   import waves from '@/directive/waves' // waves directive
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -241,6 +249,7 @@
         }
       }
       return {
+        userListOptions: [],
         idTypeOptions,
         createAccountRules: {
           name: [{ required: true, trigger: 'blur', validator: validateName }],
@@ -269,7 +278,7 @@
           id: '',
           name: '',
           thirdPartyUserId: '',
-          idType: 'CRED_PSN_CH_IDCARD',
+          idType: 'CRED_ORG_USCC',
           idNumber: '',
           mobile: '',
           email: '',
@@ -282,6 +291,15 @@
       this.getList()
     },
     methods: {
+      getRemoteUserList(query) {
+        searchAccount({ keyword: query }).then(response => {
+          if (!response.data) {
+            return
+          } else {
+            this.userListOptions = response.data
+          }
+        })
+      },
       getList() {
         this.listLoading = true
         fetchOrg(this.listQuery).then(response => {
@@ -299,11 +317,12 @@
         this.temp = {
           id: '',
           name: '',
+          creator: '',
           thirdPartyUserId: '',
-          idType: 'CRED_PSN_CH_IDCARD',
+          idType: 'CRED_ORG_USCC',
           idNumber: '',
-          mobile: '',
-          email: '',
+          orgLegalName: '',
+          orgLegalIdNumber: '',
           createTime: ''
         }
       },
@@ -366,10 +385,10 @@
             })
           })
       },
-      createAccount() {
+      createOrg() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            createAccount(this.temp).then(response => {
+            createOrg(this.temp).then(response => {
               this.createFormVisible = false
               const code = response.status
               if (code === 200) {
