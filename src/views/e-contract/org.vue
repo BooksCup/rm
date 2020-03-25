@@ -14,8 +14,8 @@
       <el-button
         class="filter-item"
         style="margin-left: 10px;"
-        type="primary"
-        icon="el-icon-edit"
+        type="success"
+        icon="el-icon-document-add"
         @click="handleCreate"
       >
         添加

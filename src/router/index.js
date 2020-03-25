@@ -137,7 +137,7 @@ export const asyncRoutes = [
     name: 'Econtract',
     meta: {
       title: '电子合同',
-      icon: 'table',
+      icon: 'clipboard',
       roles: ['admin', 'editor'] // you can set roles in root nav
     },
     children: [
